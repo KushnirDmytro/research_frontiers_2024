@@ -1,6 +1,6 @@
 from constants import *
 from imagepreprocessor import ImagePreprocessor
-from commonutils import *
+from utils import *
 import cv2
 import matplotlib.pyplot as plt
 import json
@@ -50,13 +50,6 @@ def estimate_camera_motion():
             new_R = pose[:, :COL4]
             new_t = pose[:, COL4].reshape(3,1)
             
-            #essential_mat, _ = cv2.findEssentialMat(features1[:, :COL3], features2[:, :COL3], focal=K[ROW1, COL1], pp=(K[ROW1, COL3], K[ROW2, COL3]), method=cv2.RANSAC, prob=0.999, threshold=0.5)
-            #_, new_R, new_t, mask = cv2.recoverPose(essential_mat, features1[:, :COL3], features2[:, :COL3], K)
-            #if np.linalg.det(new_R) < 0:
-            #    new_R = -new_R
-            #    new_t = -new_t
-            #pre_calc_poses[frame_name] = list(np.column_stack((new_R, new_t)))
-
             pre_calc_poses[frame_name] = list(pose)
             
 
@@ -94,46 +87,6 @@ def estimate_camera_motion():
     
     cv2.destroyAllWindows()
     plt.show()
-
-
-
-
-def load_features():
-    print('loading features...')
-    feature_file_paths = os.listdir(FEATURE_FILES_DIR)
-    feature_file_paths.sort()
-    total_features = {}
-    
-    for path in feature_file_paths:
-        with open(FEATURE_FILES_DIR + path, 'r') as feature_file:
-            features = json.load(feature_file)
-        total_features.update(features) 
-    
-    print('features loaded...')
-    return total_features
-
-
-
-def load_poses():
-    try:
-        with open(POSE_FILE, 'r') as pose_file:
-            poses = json.load(pose_file)
-    except:
-        with open(POSE_FILE, 'w') as pose_file:
-            pose_file.write('{}')
-        poses = {}
-
-    return poses
-
-        
-
-def read_image(frame_count):
-    filename = f'{str(frame_count).zfill(ZERO_PAD)}.png'
-    image = cv2.imread(PROCESSED_DATA_DIR + filename)
-    image = image[CROP_MIN:, :] # TODO: to be changed
-    return image
-
-
 
 
 if __name__ == "__main__":

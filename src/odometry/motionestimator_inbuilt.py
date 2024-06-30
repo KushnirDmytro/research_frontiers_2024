@@ -1,6 +1,6 @@
 # from constants import *
 from imagepreprocessor import ImagePreprocessor
-from commonutils import *
+from src.odometry.utils import *
 import cv2
 import matplotlib.pyplot as plt
 import json
@@ -81,46 +81,6 @@ def estimate_camera_motion():
     
     cv2.destroyAllWindows()
     plt.show()
-
-
-
-
-def load_features():
-    print('loading features...')
-    feature_file_paths = os.listdir(FEATURE_FILES_DIR)
-    feature_file_paths.sort()
-    total_features = {}
-    
-    for path in feature_file_paths:
-        with open(FEATURE_FILES_DIR + path, 'r') as feature_file:
-            features = json.load(feature_file)
-        total_features.update(features) 
-    
-    print('features loaded...')
-    return total_features
-
-
-
-def load_poses():
-    try:
-        with open(POSE_FILE, 'r') as pose_file:
-            poses = json.load(pose_file)
-    except:
-        with open(POSE_FILE, 'w') as pose_file:
-            pose_file.write('{}')
-        poses = {}
-
-    return poses
-
-        
-
-def read_image(frame_count):
-    filename = f'{str(frame_count).zfill(ZERO_PAD)}.png'
-    image = cv2.imread(PROCESSED_DATA_DIR + filename)
-    image = image[CROP_MIN:, :] # TODO: to be changed
-    return image
-
-
 
 
 if __name__ == "__main__":

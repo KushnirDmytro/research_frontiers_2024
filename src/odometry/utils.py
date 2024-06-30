@@ -94,10 +94,13 @@ def extract_features(image1, image2, features_cache, frame):
 
     return features1, features2
 
-
 def write_to_file(features1, features2, frame):
     with open(FEATURE_FILE, 'r') as feature_file:
-        features = json.load(feature_file)
+        try:
+            features = json.load(feature_file)
+        except json.JSONDecodeError:
+            features = {}
+            print('empty or broken features file')
     
     features[frame] = {
             'features1': list(features1),
@@ -105,7 +108,6 @@ def write_to_file(features1, features2, frame):
         }
     with open(FEATURE_FILE, 'w') as feature_file:
         json.dump(features, feature_file)
-
 
 
 def get_possible_camera_poses(essential_mat):
