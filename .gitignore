@@ -23,3 +23,10 @@ build/
 Thumbs.db
 
 .ipynb_checkpoints/
+
+*.png
+*.json
+*.csv
+*.jpg
+
+__pycache__/
