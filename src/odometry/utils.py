@@ -40,10 +40,10 @@ def fundmntl_mat_from_8_point_ransac(point_list1, point_list2):
 
 
 
-def extract_features(image1, image2, features, frame):
-    if features is not None and features.get(frame) is not None:
-        features1 = features.get(frame).get('features1')
-        features2 = features.get(frame).get('features2')
+def extract_features(image1, image2, features_cache, frame):
+    if features_cache is not None and features_cache.get(frame) is not None:
+        features1 = features_cache.get(frame).get('features1')
+        features2 = features_cache.get(frame).get('features2')
         
         features1 = np.array(features1)
         features2 = np.array(features2)
@@ -62,13 +62,6 @@ def extract_features(image1, image2, features, frame):
     else:
         features1 = []
         features2 = []
-        '''
-        Before using sift:
-        1) if opencv_contrib_python is already there and is of some other version (not 3.4.2.16)  
-                >> pip uninstall opencv_contrib_python
-        
-        2) >> python -m pip install --user opencv-contrib-python==3.4.2.16
-        '''
 
         # Initiate SIFT detector
         sift = cv2.SIFT_create()
@@ -224,9 +217,6 @@ def get_linear_triangulated_points(pose, point_list1, point_list2):
     return points_3D
 
 
-
-
-
 def get_nonlinear_triangulated_points(points_3D, pose, point_list1, point_list2):
     P = np.eye(3,4)
     P_dash = pose
@@ -290,3 +280,38 @@ def non_linear_pnp_error(pose, points_3D, points_left, points_right):
 
     error = dist1 + dist2
     return error
+
+
+
+def load_features():
+    print('loading features...')
+    feature_file_paths = os.listdir(FEATURE_FILES_DIR)
+    feature_file_paths.sort()
+    total_features = {}
+    
+    for path in feature_file_paths:
+        with open(FEATURE_FILES_DIR + path, 'r') as feature_file:
+            features = json.load(feature_file)
+        total_features.update(features) 
+    
+    print('features loaded...')
+    return total_features
+
+
+
+def load_poses():
+    try:
+        with open(POSE_FILE, 'r') as pose_file:
+            poses = json.load(pose_file)
+    except:
+        with open(POSE_FILE, 'w') as pose_file:
+            pose_file.write('{}')
+        poses = {}
+
+    return poses
+
+def read_image(frame_count):
+    filename = f'{str(frame_count).zfill(ZERO_PAD)}.png'
+    image = cv2.imread(PROCESSED_DATA_DIR + filename)
+    image = image[CROP_MIN:, :] # TODO: to be changed
+    return image
